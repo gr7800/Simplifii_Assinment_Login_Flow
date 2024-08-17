@@ -1,1 +1,1 @@
-export const BaseUrl = 'http://localhost:8080'
+export const BaseUrl = 'https://simplifii-assinment-login-flow.onrender.com'
