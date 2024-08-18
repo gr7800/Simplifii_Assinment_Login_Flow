@@ -3,6 +3,8 @@ const nodemailer = require("nodemailer");
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 let temporaryStore = {};
+const OTP_ATTEMPT_LIMIT = 5;
+const LOCKOUT_TIME_MINUTES = 30;
 
 // Set up the email transporter
 const transporter = nodemailer.createTransport({
@@ -96,7 +98,6 @@ exports.RegisterController = async (req, res) => {
 exports.LoginController = async (req, res) => {
   const { email, otp } = req.body;
   try {
-    // Find user by email
     const user = await UserModel.findOne({ email });
 
     if (!user) {
@@ -105,14 +106,23 @@ exports.LoginController = async (req, res) => {
         .send({ message: "User not found register user first!" });
     }
 
-    // Verify OTP
-    if (otp !== user?.otp) {
-      return res
-        .status(400)
-        .send({ message: "Invalid OTP. Please try again!" });
+    if (user.lockoutUntil && user.lockoutUntil > new Date()) {
+      const remainingTime = Math.ceil((user.lockoutUntil - new Date()) / 60000); // in minutes
+      return res.status(403).send({ message: `You exceeded the maximum attempts. Please try again after ${remainingTime} minutes.` });
     }
 
-    // Generate JWT token
+    if (otp !== user.otp) {
+      user.otpAttempts = (user.otpAttempts || 0) + 1;
+      if (user.otpAttempts >= OTP_ATTEMPT_LIMIT) {
+        user.lockoutUntil = new Date(Date.now() + LOCKOUT_TIME_MINUTES * 60000); // 30 minutes lockout
+      }
+      await user.save();
+      return res.status(400).send({ message: "Invalid OTP. Please try again!" });
+    }
+
+    user.otpAttempts = 0; // reset attempts after successful login
+    await user.save();
+
     const token = jwt.sign(
       {
         email: user?.email,
@@ -123,7 +133,7 @@ exports.LoginController = async (req, res) => {
       { expiresIn: "7 days" }
     );
 
-    res.status(201).send({ message: "User registered successfully!", token });
+    res.status(201).send({ message: "Login successful!", token });
   } catch (error) {
     console.error(error);
     res.status(500).send(error.message);

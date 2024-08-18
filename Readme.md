@@ -16,7 +16,7 @@ This project is a user authentication system built with React, Redux, and Node.j
 
 ### Frontend
 
-#### Deployed Url:- `https://simplifii-guddu.netlify.app/login`
+#### Deployed Url:- `https://simplifii-guddu.netlify.app`
 
 1. **Clone the Repository**
 
@@ -41,75 +41,238 @@ This project is a user authentication system built with React, Redux, and Node.j
 
 #### Deployed Url:- `https://simplifii-assinment-login-flow.onrender.com`
 
-1. **Navigate to the Backend Directory**
 
-   ```bash
-   cd backend
-   ```
+---
 
-2. **Install Dependencies**
+## Overview
 
+This project is a Node.js application using Express for the backend with JWT authentication and OTP-based user registration. It also uses Nodemailer for sending OTPs via email.
+
+## Technologies Used
+
+- **Node.js**: JavaScript runtime for server-side development.
+- **Express**: Web application framework for Node.js.
+- **Mongoose**: MongoDB object modeling tool.
+- **JWT**: JSON Web Token for authentication.
+- **Nodemailer**: Module for sending emails.
+- **dotenv**: Module to load environment variables from a `.env` file.
+- **CORS**: Middleware for enabling Cross-Origin Resource Sharing.
+
+## Setup
+
+1. **Install Dependencies**
    ```bash
    npm install
    ```
 
-3. **Start the Server**
+2. **Configure Environment Variables**
+   Create a `.env` file in the root directory and add the following variables:
+   ```
+   EMAIL=your_email@gmail.com
+   PASSWORD=your_email_password
+   JWT_SECRET=your_jwt_secret
+   PORT=8080
+   ```
 
+3. **Start the Server**
    ```bash
    npm start
    ```
 
-## Configuration
+## Routes
 
-1. **Environment Variables**
+### 1. Register User
 
-   Create a `.env` file in the root directory and add the following environment variables:
+- **Endpoint**: `/user/register`
+- **Method**: `POST`
+- **Description**: Registers a new user after validating the OTP.
+- **Request Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "name": "User Name",
+    "mobile": "1234567890",
+    "isd": "+1",
+    "otp": "123456"
+  }
+  ```
+- **Responses**:
+  - `201 Created`: Successfully registered.
+  - `404 Not Found`: User already registered.
+  - `400 Bad Request`: Invalid OTP.
+  - `500 Internal Server Error`: Server error.
 
-   ```plaintext
-   EMAIL=your-email@gmail.com
-   PASSWORD=your-email-password
-   JWT_SECRET=your-jwt-secret
-   ```
+### 2. Get OTP
 
-   Ensure you have a valid Gmail account set up for sending OTP emails.
+- **Endpoint**: `/user/getotp`
+- **Method**: `POST`
+- **Description**: Sends an OTP to the specified email.
+- **Request Body**:
+  ```json
+  {
+    "email": "user@example.com"
+  }
+  ```
+- **Responses**:
+  - `200 OK`: OTP sent successfully.
+  - `409 Conflict`: Email already registered.
+  - `500 Internal Server Error`: Server error.
 
-2. **Database**
+### 3. Resend OTP
 
-   Ensure you have a MongoDB instance running. You may need to configure the connection URL in your backend code if necessary.
+- **Endpoint**: `/user/resendotp`
+- **Method**: `POST`
+- **Description**: Resends a new OTP to the specified email.
+- **Request Body**:
+  ```json
+  {
+    "email": "user@example.com"
+  }
+  ```
+- **Responses**:
+  - `200 OK`: OTP resent successfully.
+  - `404 Not Found`: User not found.
+  - `500 Internal Server Error`: Server error.
 
-## Usage
+### 4. Login User
 
-- **Login Page**: Access the login page at `/login` to log in or request an OTP.
-- **Home Page**: After logging in successfully, users are redirected to the home page displaying a welcome message.
+- **Endpoint**: `/user/login`
+- **Method**: `POST`
+- **Description**: Logs in a user after verifying the OTP.
+- **Request Body**:
+  ```json
+  {
+    "email": "user@example.com",
+    "otp": "123456"
+  }
+  ```
+- **Responses**:
+  - `201 Created`: Login successful with JWT token.
+  - `404 Not Found`: User not found.
+  - `400 Bad Request`: Invalid OTP.
+  - `403 Forbidden`: User is locked out.
+  - `500 Internal Server Error`: Server error.
 
-## Folder Structure
+### 5. Get User Details
 
-```
-- frontend/
-  - src/
-    - components/          # Reusable components
-    - pages/               # React components for different pages
-    - redux/               # Redux setup and actions
-    - utils/               # Utility functions and data
-- backend/
-  - controllers/           # Express route handlers
-  - models/                # Mongoose models
-  - routes/                # API routes
-  - middleware/            # Middleware functions
-  - config/                # Configuration files
-- .env                     # Environment variables
-- package.json             # Project dependencies and scripts
-```
+- **Endpoint**: `/user/singleuser`
+- **Method**: `GET`
+- **Description**: Retrieves user details based on JWT token.
+- **Headers**:
+  - `token`: JWT token (required)
+- **Responses**:
+  - `200 OK`: User details retrieved successfully.
+  - `403 Forbidden`: Unauthorized (Invalid token).
+  - `404 Not Found`: User not found.
+  - `401 Unauthorized`: Invalid token.
 
-## Scripts
+## Middleware
 
-- **Frontend**
-  - `npm start`: Run the React development server.
-  - `npm build`: Build the React application for production.
-  - `npm test`: Run tests.
+### 1. Verify Token Middleware
 
-- **Backend**
-  - `npm start`: Start the Express server.
+- **Path**: `Middleware/Authentication.Middleware.js`
+- **Description**: Verifies the JWT token provided in the request headers. Adds user information to the request object if valid.
+
+### 2. OTP Limit Middleware
+
+- **Path**: `Middleware/LoginAttempt.Middleware.js`
+- **Description**: Limits the number of OTP attempts. Locks the user out for 30 minutes after 5 incorrect attempts.
+
+## User Model
+
+- **Schema Fields**:
+  - `name`: User's name (required).
+  - `email`: User's email (required, unique).
+  - `mobile`: User's mobile number (required).
+  - `isd`: International dialing code (required).
+  - `otp`: OTP for verification (default: "1234").
+  - `otpAttempts`: Number of OTP attempts (default: 0).
+  - `lockoutUntil`: Date until which the user is locked out (default: null).
+
+---
+---
+
+## Technologies Used
+
+- **Frontend:**
+  - **React:** For building user interfaces.
+  - **React Router DOM:** For routing and navigation within the application.
+  - **Tailwind CSS:** For styling and layout.
+  - **Redux:** For state management.
+  - **React-Toastify:** For displaying notifications.
+
+- **Backend:**
+  - **Node.js** (Assumed): For handling server-side logic (details not provided).
+
+## Routing Details
+
+### MainRoutes Component
+
+- **Location:** `src/Routes/MainRoutes.js`
+- **Description:** Defines the main routes of the application.
+
+#### Routes
+
+1. **Home Route**
+   - **Path:** `/`
+   - **Component:** `PrivateRoute` wrapped around `Home`
+   - **Description:** Accessible only for authenticated users. Redirects to login if the user is not authenticated.
+
+2. **Register Route**
+   - **Path:** `/register`
+   - **Component:** `Signup`
+   - **Description:** Allows users to register by providing their details and receiving an OTP for verification.
+
+3. **Login Route**
+   - **Path:** `/login`
+   - **Component:** `Login`
+   - **Description:** Provides a login form for users to access their accounts.
+
+### PrivateRoute Component
+
+- **Location:** `src/Routes/PrivateRoute.js`
+- **Description:** Protects routes that require authentication. Checks if the user is authenticated and handles token verification.
+
+#### Key Points
+
+- **Authentication Check:** Uses Redux to check if the user is authenticated.
+- **Token Handling:** Retrieves token from local storage and verifies user status.
+- **Loading State:** Displays a loading indicator while checking authentication status.
+- **Redirect:** Redirects unauthenticated users to the login page.
+
+### Signup Component
+
+- **Location:** `src/Page/Signup/Signup.js`
+- **Description:** Handles user registration, including form validation, OTP handling, and user registration.
+
+#### Key Features
+
+- **Form Fields:**
+  - Salutation
+  - Name
+  - Country Code
+  - Mobile Number
+  - Email
+  - OTP (conditionally shown based on button state)
+  
+- **Button States:**
+  - **"Get OTP on email":** Initiates OTP request.
+  - **"Submit":** Submits registration details and OTP for verification.
+
+- **OTP Handling:** Manages OTP request and submission with a timer for re-sending OTP.
+- **Validation:** Validates form inputs and OTP before submission.
+
+### Home Component
+
+- **Location:** `src/Page/Home/Home.js`
+- **Description:** Displays a welcome message to authenticated users.
+
+#### Key Features
+
+- **User Greeting:** Displays the logged-in user's name and a welcome message.
+- **Navbar:** Includes a navigation bar component for user interactions.
+
+---
 
 ## Contributing
 

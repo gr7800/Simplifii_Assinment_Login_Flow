@@ -1,7 +1,6 @@
 // Require the Mongoose library.
 const mongoose = require("mongoose");
 
-// Define the user schema with fields for full name, user name, email, password, and avatar.
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -24,6 +23,14 @@ const userSchema = new mongoose.Schema(
     otp: {
       type: String,
       default: "1234"
+    },
+    otpAttempts: {
+      type: Number,
+      default: 0,
+    },
+    lockoutUntil: {
+      type: Date,
+      default: null,
     }
   },
   // Set options for the schema.

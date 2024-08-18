@@ -49,7 +49,7 @@ const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name
                         ${(value?.length > 0 || isOpen) ? 'border-orange-500' : 'border-gray-300'}
                          rounded ${error ? 'border-red-500' : ''}`}
                     >
-                        <label htmlFor="search" className={`absolute top-[-0.70rem] left-2 bg-white px-1 ${(value?.length > 0 || isOpen) ? 'text-orange-500' : 'text-gray-500'} ${error ? 'text-red-500' : ''} text-primary-500 text-xs`}>{title}</label>
+                        <label htmlFor="search" className={`absolute top-[-0.5rem] left-2 bg-white px-1 ${(value?.length > 0 || isOpen) ? 'text-orange-500' : 'text-gray-500'} ${error ? 'text-red-500' : ''} text-primary-500 text-xs`}>{title}</label>
                         <div className="flex ">
                             <input
                                 type="search"
@@ -116,7 +116,7 @@ const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name
                     <div className="relative w-full">
                         <input
                             name={name}
-                            id="inputbox"
+                            id={"inputbox"+name}
                             type="text"
                             value={value}
                             onChange={(e) => setValue(e.target.value, name)}
@@ -124,20 +124,21 @@ const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name
                             className={`peer w-full px-3 py-2 border border-gray-300 rounded-md text-gray-600 placeholder-transparent focus:outline-none focus:ring-0 focus:border-orange-500 ${value?.length > 0 ? 'border-orange-500' : ''} ${error ? 'border-red-500' : ''}`}
                         />
                         <label
-                            htmlFor="inputbox"
-                            className={`absolute bg-white px-1 left-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 transition-all duration-300 
-                                ${value?.length > 0 ? '-top-0.5 text-orange-500 text-xs' : 'peer-focus:-top-0.5 peer-focus:text-orange-500 peer-focus:text-xs'}
-                                 ${error ? 'text-red-500' : ''}`}
+                            htmlFor={"inputbox"+name}
+                            className={`absolute bg-white p-1 left-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 transition-all duration-300 
+                                ${value?.length > 0 || error || document.activeElement === document.getElementById('inputbox'+name) ? 'top-0.5 text-orange-500 text-xs peer-focus:top-0.5' : 'text-gray-600 text-xs peer-focus:top-0.5 peer-focus:text-orange-500'}
+                        ${error ? 'text-red-500 peer-focus:text-orange-500' : ''}`}
                         >
-                            {title}
-                        </label>
-                    </div>
-                    {error && (
-                        <p className={`text-red-500 text-sm font-normal text-center`}>{error}</p>
-                    )}
+                        {title}
+                    </label>
                 </div>
+                    {error && (
+                <p className={`text-red-500 text-sm font-normal text-center`}>{error}</p>
             )}
         </div>
+    )
+}
+        </div >
     );
 };
 
