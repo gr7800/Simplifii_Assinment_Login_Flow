@@ -1,7 +1,13 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 
 const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name }) => {
-    const [isOpen, setIsOpen] = React.useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+    const [hasValue, setHasValue] = useState(false);
+
+    useEffect(() => {
+        setHasValue(value.length > 0);
+    }, [value]);
 
     const toggleDropdown = (e) => {
         e.preventDefault();
@@ -9,54 +15,58 @@ const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name
     };
 
     const selectOption = (option) => {
-        if (isOpen) {
-            setIsOpen(false);
-        }
         setValue(option, name);
-        setIsOpen(false); // Clear search term after selection
+        setIsOpen(false);
     };
 
     const handleSearchChange = (e) => {
-        e.preventDefault();
-        if (!isOpen) {
-            setIsOpen(true);
-        }
         setValue(e.target.value, name);
+        if (!isOpen) setIsOpen(true);
     };
 
-    // console.log('Search Value:', value);
-    // console.log('List:', list);
-    // console.log('Filtered List:', filteredList);
+    const handleFocus = () => {
+        setIsFocused(true);
+        setHasValue(true);
+    };
+
+    const handleBlur = (e) => {
+        setIsFocused(false);
+        setHasValue(e.target.value.length > 0);
+    };
 
     const searchTerm = (value || '').toLowerCase();
-    console.log(typeof searchTerm)
     const filteredList = list.filter(el => {
         const nameMatch = el.name.toLowerCase().includes(searchTerm);
-        // Convert value to string for comparison
         const valueMatch = String(el.value).toLowerCase().includes(searchTerm);
-        // console.log(searchTerm)
-
         return nameMatch || valueMatch;
     });
-
-
 
     return (
         <div className="w-full">
             {type === "dropdown" && (
                 <div className="w-full">
-                    <div className={`relative max-w-[150px] px-3 py-2 border 
-                        ${(value?.length > 0 || isOpen) ? 'border-orange-500' : 'border-gray-300'}
-                         rounded ${error ? 'border-red-500' : ''}`}
+                    <div className={`relative max-w-[150px] px-3 py-2 border
+                        ${(hasValue || isOpen) ? 'border-orange-500' : 'border-gray-300'}
+                        rounded ${error ? 'border-red-500' : ''}`}
                     >
-                        <label htmlFor="search" className={`absolute top-[-0.5rem] left-2 bg-white px-1 ${(value?.length > 0 || isOpen) ? 'text-orange-500' : 'text-gray-500'} ${error ? 'text-red-500' : ''} text-primary-500 text-xs`}>{title}</label>
-                        <div className="flex ">
+                        <label
+                            htmlFor={name}
+                            className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-all bg-white px-1 cursor-pointer
+                            ${hasValue || isFocused ? 'top-[-3px] text-[11px]' : ''}
+                            ${error ? 'text-red-500' : hasValue || isFocused ? 'text-[rgb(236,147,36)]' : 'text-gray-500'}`}
+                        >
+                            {title}
+                        </label>
+                        <div className="flex">
                             <input
+                                id={name}
                                 type="search"
                                 value={value}
-                                placeholder=''
                                 onChange={handleSearchChange}
-                                className="flex-1 w-full bg-transparent border-none outline-none text-gray-600 text-ellipsis"
+                                onFocus={handleFocus}
+                                onBlur={handleBlur}
+                                placeholder=""
+                                className="flex-1 w-full bg-transparent border-none outline-none text-gray-600"
                             />
                             <button
                                 className="flex items-center justify-center bg-white text-gray-600 relative"
@@ -93,14 +103,14 @@ const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name
                             </button>
                         </div>
                         {isOpen && (
-                            <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 max-h-[200px] overflow-y-scroll overflow-x-hidden custom-scrollbar">
+                            <ul className="absolute left-0 w-full mt-1 bg-white border border-gray-300 rounded shadow-lg z-10 max-h-[200px] overflow-y-scroll overflow-x-hidden">
                                 {filteredList.length > 0 && filteredList.map((el) => (
                                     <li
                                         key={el.id + name}
                                         onClick={() => selectOption(el?.value)}
                                         className="p-3 hover:bg-gray-200 cursor-pointer"
                                     >
-                                        {name == "countryCode" ? el?.value + " " + el?.name : el?.name}
+                                        {name === "countryCode" ? el?.value + " " + el?.name : el?.name}
                                     </li>
                                 ))}
                             </ul>
@@ -115,30 +125,34 @@ const InputBoxDropDown = ({ type, title, value, setValue, list = [], error, name
                 <div className="w-full">
                     <div className="relative w-full">
                         <input
+                            id={name}
                             name={name}
-                            id={"inputbox"+name}
                             type="text"
                             value={value}
                             onChange={(e) => setValue(e.target.value, name)}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
                             placeholder=""
-                            className={`peer w-full px-3 py-2 border border-gray-300 rounded-md text-gray-600 placeholder-transparent focus:outline-none focus:ring-0 focus:border-orange-500 ${value?.length > 0 ? 'border-orange-500' : ''} ${error ? 'border-red-500' : ''}`}
+                            className={`peer w-full px-3 py-2 border border-gray-300 rounded-md text-gray-600 placeholder-transparent focus:outline-none focus:ring-0
+                            ${hasValue ? 'border-orange-500' : 'border-gray-300'}
+                            ${error ? 'border-red-500' : ''}
+                            ${isFocused ? 'focus:border-[rgb(236,147,36)]' : 'focus:border-gray-300'}`}
                         />
                         <label
-                            htmlFor={"inputbox"+name}
-                            className={`absolute bg-white p-1 left-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-600 transition-all duration-300 
-                                ${value?.length > 0 || error || document.activeElement === document.getElementById('inputbox'+name) ? 'top-0.5 text-orange-500 text-xs peer-focus:top-0.5' : 'text-gray-600 text-xs peer-focus:top-0.5 peer-focus:text-orange-500'}
-                        ${error ? 'text-red-500 peer-focus:text-orange-500' : ''}`}
+                            htmlFor={name}
+                            className={`absolute left-3 top-1/2 -translate-y-1/2 text-sm transition-all bg-white px-1 cursor-pointer
+                            ${hasValue || isFocused ? 'top-[-3px] text-[11px]' : 'text-gray-500'}
+                            ${error ? 'text-red-500' : hasValue || isFocused ? 'text-[rgb(236,147,36)]' : 'text-gray-500'}`}
                         >
-                        {title}
-                    </label>
-                </div>
+                            {title}
+                        </label>
+                    </div>
                     {error && (
-                <p className={`text-red-500 text-sm font-normal text-center`}>{error}</p>
+                        <p className={`text-red-500 text-sm font-normal text-center`}>{error}</p>
+                    )}
+                </div>
             )}
         </div>
-    )
-}
-        </div >
     );
 };
 

@@ -1,7 +1,5 @@
+import { BaseUrl } from "../../Utills/Constant";
 import { LOGIN_ERROR, LOGIN_REQUEST, LOGIN_SUCCESS, LOGOUT,PROFILE_SUCCESS } from "./auth.type";
-
-// Base URL for API requests
-const BaseUrl = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8080';
 
 // Action to register a user
 export const RegisterUser = async (userData) => {

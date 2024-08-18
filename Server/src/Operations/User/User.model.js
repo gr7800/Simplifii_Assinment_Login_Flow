@@ -18,7 +18,7 @@ const userSchema = new mongoose.Schema(
     },
     isd: {
       type: String,
-      required: true,
+      default: "+91"
     },
     otp: {
       type: String,
@@ -26,7 +26,7 @@ const userSchema = new mongoose.Schema(
     },
     otpAttempts: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     lockoutUntil: {
       type: Date,

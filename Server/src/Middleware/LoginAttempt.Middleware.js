@@ -8,29 +8,23 @@ const otpLimitMiddleware = async (req, res, next) => {
 
   try {
     const user = await UserModel.findOne({ email });
-
+    console.log(user)
     if (!user) {
       return res.status(404).send({ message: "User not found!" });
     }
 
-    if (user.lockoutUntil && user.lockoutUntil > new Date()) {
-      const remainingTime = Math.ceil((user.lockoutUntil - new Date()) / 60000); // in minutes
-      return res
-        .status(403)
-        .send({
-          message: `You exceeded the maximum attempts. Please try again after ${remainingTime} minutes.`,
-        });
+    if (user.lockoutUntil && new Date(user.lockoutUntil) > new Date()) {
+      const remainingTime = Math.ceil((new Date(user.lockoutUntil) - new Date()) / 60000); // in minutes
+      return res.status(403).send({
+        message: `You exceeded the maximum attempts. Please try again after ${remainingTime} minutes.`,
+      });
     }
 
-    if (user.otpAttempts >= OTP_ATTEMPT_LIMIT) {
-      user.lockoutUntil = new Date(Date.now() + LOCKOUT_TIME_MINUTES * 60000); // 30 minutes lockout
-      user.otpAttempts = 0; // reset attempts
+    // Reset attempts if lockout period has expired
+    if (user.lockoutUntil && new Date(user.lockoutUntil) <= new Date()) {
+      user.otpAttempts = 1;
+      user.lockoutUntil = undefined;
       await user.save();
-      return res
-        .status(403)
-        .send({
-          message: `You exceeded the maximum attempts. Please try again after 30 minutes.`,
-        });
     }
 
     req.user = user;

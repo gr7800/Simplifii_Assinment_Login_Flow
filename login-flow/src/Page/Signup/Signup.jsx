@@ -202,8 +202,8 @@ const Signup = () => {
                         <img src={logo} alt="logo" className="mx-auto" width={"100px"} height={"50px"} />
                         <p className="text-[18px] m-4 font-montserrat font-medium text-[#000000DE]">Register as an expert</p>
                     </div>
-                    <form className="space-y-4 space-x-auto" onSubmit={handleSubmit}>
-                        <div className="flex flex-row space-x-4">
+                    <form className="space-y-5 space-x-auto" onSubmit={handleSubmit}>
+                        <div className="flex flex-row space-x-5">
                             <div className="flex-1 max-w-[100px]">
                                 <InputBoxDropDown
                                     name={"salutation"}
@@ -225,7 +225,7 @@ const Signup = () => {
                                 />
                             </div>
                         </div>
-                        <div className="flex flex-row space-x-4">
+                        <div className="flex flex-row space-x-5">
                             <div className="flex-1 max-w-[100px]">
                                 <InputBoxDropDown
                                     name={'countryCode'}
@@ -248,7 +248,7 @@ const Signup = () => {
                                 />
                             </div>
                         </div>
-                        <div className="flex flex-row space-x-4">
+                        <div className="flex flex-row space-x-5">
                             <InputBoxDropDown
                                 name={"email"}
                                 type={"inputbox"}
@@ -260,7 +260,7 @@ const Signup = () => {
                         </div>
 
                         {buttontitle === "Submit" && (
-                            <div className="flex flex-row space-x-4">
+                            <div className="flex flex-row space-x-5">
                                 <InputBoxDropDown
                                     name={"otp"}
                                     type={"inputbox"}
