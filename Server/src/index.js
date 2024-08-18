@@ -6,7 +6,9 @@ const cors = require("cors");
 const PORT = process.env.PORT || 8080;
 
 const app = express();
-
+app.get("/", (req,res)=>{
+  res.status(200).send("Welcome!")
+})
 const UserRoutes = require("./Operations/User/User.route");
 
 app.use(cors({ origin: true, credentials: true }));
