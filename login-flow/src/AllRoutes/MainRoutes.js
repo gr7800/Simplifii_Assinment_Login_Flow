@@ -8,7 +8,8 @@ import Signup from '../Page/Signup/Signup'
 const MainRoutes = () => {
     return (
         <Routes>
-            <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} />
+            {/* <Route path="/" element={<PrivateRoute><Home /></PrivateRoute>} /> */}
+            <Route path="/" element={<Home />} />
             <Route path="/register" element={<Signup />} />
             <Route path="/login" element={<Login />} />
         </Routes>

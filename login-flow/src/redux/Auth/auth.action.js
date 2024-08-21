@@ -37,7 +37,23 @@ export const LoginUser = async (userData) => {
 // Action to get OTP
 export const GetOtp = async (creds) => {
     try {
-        const response = await fetch(`${BaseUrl}/user/getotp`, {
+        const response = await fetch(`${BaseUrl}/self-registration/register`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(creds),
+        });
+        const data = await response.json();
+        return data;
+    } catch (e) {
+        console.log(e);
+    }
+};
+
+export const verifyOtp = async (creds) => {
+    try {
+        const response = await fetch(`${BaseUrl}/self-registration/verify-otp`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -95,7 +111,10 @@ export const singleuser = () => async (dispatch) => {
 
 // Example of a potential future action
 export const Logout = () => {
-    return {
-        type: LOGOUT
-    };
+    localStorage.removeItem("unverifieduser")
 };
+// export const Logout = () => {
+//     return {
+//         type: LOGOUT
+//     };
+// };

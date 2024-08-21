@@ -3,11 +3,14 @@ import { Link } from 'react-router-dom'; // Assuming you're using React Router f
 import logo from "../../Utills/image/logo.png";
 import { useDispatch } from 'react-redux';
 import { LOGOUT } from '../../redux/Auth/auth.type';
+import { Logout } from '../../redux/Auth/auth.action';
 
 const Navbar = ({ Auth }) => {
     const dispatch = useDispatch();
     const handlelogout = ()=>{
-        dispatch({type:LOGOUT});
+        Logout()
+            window.location.reload();
+        // dispatch({type:LOGOUT});
     }
     return (
         <nav className="bg-white text-orange-500 shadow-md fixed top-0 w-full">
